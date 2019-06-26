@@ -1,3 +1,0 @@
-EXTRACTCLASS data/classesToBeExtract.txt
-STRUCTURESFILE data/test_extractClass.sdf
-REPORT 1
