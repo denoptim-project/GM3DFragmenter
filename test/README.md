@@ -1,3 +1,3 @@
-# Tests for GM3DFRagmenter
+# Tests for GM3DFragmenter
 
 'WARNING' No test available for now.
