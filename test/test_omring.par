@@ -1,0 +1,9 @@
+#
+# Parameters for GM3DFragmenter
+#
+ADDDUMMYONLINEAR
+LINEARBONDTHLD 170.0
+STRUCTURESFILE data/test_omring.sdf
+REPORT 1
+RULESFILE data/test_omring.rul
+MAXFRAGSIZE 500

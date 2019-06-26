@@ -1,0 +1,3 @@
+EXTRACTSMARTS data/smartsToBeExtract.txt
+STRUCTURESFILE data/test_extractSMARTS.sdf
+REPORT 1

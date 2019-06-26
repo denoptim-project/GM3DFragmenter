@@ -1,0 +1,13 @@
+#
+# Parameters for GM3DFragmenter
+#
+CHECKFORMULA
+ANALYSEANDFIX
+ADDDUMMYONLINEAR
+LINEARBONDTHLD 170.0
+STRUCTURESFILE data/test_fragmentation_2.sd
+FORMULATXTFILE data/test_fragmentation.txt
+ADDIDTOAPCLASS
+REPORT 1
+RULESFILE ../data/cutRul_3.0.rul
+MAXFRAGSIZE 50

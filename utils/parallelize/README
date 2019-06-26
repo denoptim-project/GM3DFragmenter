@@ -1,0 +1,76 @@
+#
+# README file for 'parallelize' procedure of GM3DFragmenter
+# 
+
+What is 'parallelize'?
+======================
+It's a set of tools, scripts and manual procedures used to run a 
+list of indipendent GM3DF jobs and merge the results. This is only
+a proof of the concept that this process can be parallelized. The
+actual implementation is currently really poor...
+
+Why do I need 'parallelize'?
+============================
+Because the fragmentation with GM3DFragmenter can take quite a lot of
+time if the ionput contains a long list of large molecules. The main
+reason being the low profile of the current version of the code.
+So, you do want to speed it up!
+
+How does it work?
+=================
+The fragmentation of each molecule is completely independed from any
+other molecules in the same input file (the starting material).
+Therefore, the first task of 'parallelize' is to split
+GM3dFragmenter initial job creating a given number of totally 
+selfstending tasks that are submitted to the queuing system.
+Each task correspond to a GM3DFragmenter job with a sub set of 
+molecules taken from the starting material.
+Once all jobs are completed, the user will have to contribute to
+the initiation of the second part of 'parallelize' job, which is 
+merging the results of the independent fragmentation tasks to provide
+a unique output for the user.
+For now, it's a discontinuous process that requires just a minimal
+contribution from the user. Hopefully, having the time to complete
+the development, a more elegant version will be created.
+
+How do I use it?
+================
+Have a look into 'test_Parallelize_SplitAndMerge.sh' and see what it
+does: that's the way. Even so, I strongly reccomend 
+to do not use that script for actual jobs. This is because that script
+doesn't really submit the tasks in parallel! 
+In general the whole 'parallelize' procedure is like this:
+
+1) get a library of molecules to be fragmented
+2) run ParallelizeGM3DF.jar to prepare all the files for the parallel 
+   tasks
+
+   $javapath/java -jar $jar/ParallelizeGM3DF.jar <file> <options>
+
+3) run the script produced in step 2
+
+   ./RunAllSPLITTING_*
+
+4) prepare to split the results according to molecular weight
+
+   $javapath/java -jar $jar/SplitAndMerge.jar split <options>
+
+5) run the script generated in step 4
+
+   ./RunAllSPLITTING_*
+
+6) prepare to merge all groups referring to the same MW-bin
+
+   $javapath/java -jar $jar/SplitAndMerge.jar merge <options>
+
+7) run the script generated in step 6
+
+   ./RunAllMERGING_*
+
+8) make single files with all fragments and all unique fragments
+   and get some numbers (total number of fragments, number of unique
+   fragments, and plot of the distribution on the MW-bins)
+
+   $HOME/GM3DFragmenter/utils/parallelize/src/makeSingleLib.sh
+
+

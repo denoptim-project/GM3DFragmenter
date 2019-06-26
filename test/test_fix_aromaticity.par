@@ -1,0 +1,12 @@
+# Use '#' to comment out a line
+#
+# During this test we try to read an SD file crom Cambridge Structure Database
+# and 'kekulize' the aromatic rings, which means remove the aromatic type of bond 
+# and replase it with single/double formalism
+#
+CHECKFORMULA
+ANALYSEANDFIX
+NOFRAGMENTATION
+STRUCTURESFILE data/test_aromaticity.sd
+FORMULATXTFILE data/test_aromaticity.txt
+REPORT 1

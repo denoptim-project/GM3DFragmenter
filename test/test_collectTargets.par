@@ -1,0 +1,14 @@
+#
+# Parameters for GM3DFragmenter
+#
+CHECKFORMULA
+ANALYSEANDFIX
+ADDDUMMYONLINEAR
+LINEARBONDTHLD 165.0
+STRUCTURESFILE data/test_collectTargets.sd
+FORMULATXTFILE data/test_collectTargets.txt
+# collect only these fragments
+LOOKFORTARGETFRAGS data/test_collectTargets_TARGETS.sdf DENOPTIM
+RULESFILE ../data/cutRul_allRotatable-1.1.rul
+REPORT 2
+MAXFRAGSIZE 200

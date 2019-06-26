@@ -1,0 +1,179 @@
+###############################################################################
+###############################################################################
+##
+## "GM3DFragmenter: Cutting rules for all rotatable bonds"
+##
+## The following rules were designed for the fragmentation of the dataset of
+## organometallic compounds published by Occhipinti et al. JACS, 2006, 128, 
+## 6952-6964
+##
+##
+###############################################################################
+#
+# Rule's components matching any atom
+#
+# "Any atom but hydrogen"
+ANY [$([*;!#1])]
+# "Any atom but terminal X1"
+ANY [$([*;!X1])]
+# "Any 'small' substituent"
+ANY [$([*;!#1;X1]),$([*;X2]),$([*;X3]),$([*;X4]([#1])[#1]),$([*;X4]([#1])([#1])[#1])]
+#
+###############################################################################
+###############################################################################
+#
+# "Rotatable bonds"
+#
+###############################################################################
+###############################################################################
+#
+# C-|-C
+#
+CTR rotCsp3$Csp3$XX 100000 [C;X4] [C;X4] !@-
+CTR rotCsp2$Csp3$XX 101000 [#6;X3] [C;X4] !@-
+CTR rotCsp$Csp3$XX 102000 [#6;X2] [#6;X3] !@-
+CTR rotCsp2$Csp2$XX 103000 [#6;X3] [#6;X3] !@-
+#
+# Si-|-C
+#
+CTR rotSisp3$Csp3$XX 110000 [#14;X4] [C;X4] !@-
+#
+# C-|-Sn 
+#
+CTR rotSnsp3$Csp3$XX 120000 [$([#50;X4])] [C;X4] !@-
+#
+###############################################################################
+#
+# C-|-N or C-|-N->M
+#
+CTR rotNcn3OrCoord$Csp3$XX 130000 [$([#7;X3]),$([#7;X4](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [$([C;X4])] !@-
+CTR rotNcn3OrCoord$Csp2$XX 131000 [$([#7;X3]),$([#7;X4](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [$([#6;X3]);!$([#6]=[#8,#16])] !@-
+CTR rotNcn2OrCoord$Csp3$XX 132000 [$([#7;X2]),$([#7;X3](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [C;X4] !@-
+CTR rotNcn2OrCoord$Csp2$XX 133000 [$([#7;X2]),$([#7;X3](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [$([#6;X3]);!$([#6]=[#8,#16])] !@-
+#
+# C-|-P or C-|-P->M
+#
+CTR rotPcn3OrCoord$Csp3$XX 140000 [$([#15;X3]),$([#15;X4](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [C;X4] !@-
+CTR rotPcn3OrCoord$Csp2$XX 141000 [$([#15;X3]),$([#15;X4](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [#6;X3] !@-
+#
+# C-|-As or C-|-As->M
+#
+CTR rotAscn3OrCoord$Csp3$XX 150000 [$([#33;X3]),$([#33;X4](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [C;X4] !@-
+#
+###############################################################################
+#
+# C-|-O or C-|-O->M
+#
+CTR rotOcn2OrCoord$Csp3$XX 160000 [$([#8;X2]),$([#8;X3](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [C;X4] !@-
+CTR rotOcn2OrCoord$Csp2$XX 161000 [$([#8;X2]),$([#8;X3](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [#6;X3] !@-
+#
+# C-|-S 
+#
+CTR rotScn4$Csp3$XX 160100 [$([#16;X4])] [C;X4] !@-
+#
+###############################################################################
+#
+# C-|-X
+##CTR rotF$Csp3$XX 160200 [$([#9;X1])] [C;X4] !@-
+##CTR rotCl$Csp3$XX 160300 [$([#17;X1])] [C;X4] !@-
+##CTR rotBr$Csp3$XX 160400 [$([#35;X1])] [C;X4] !@-
+#
+##CTR rotF$Csp2$XX 160500 [$([#9;X1])] [#6;X3] !@-
+##CTR rotCl$Csp2$XX 160600 [$([#17;X1])] [#6;X3] !@-
+##CTR rotBr$Csp2$XX 160700 [$([#35;X1])] [#6;X3] !@-
+#
+###############################################################################
+#
+###############################################################################
+#
+#
+# N-|-Cl
+#
+###CTR rotN$Cl$XX 160800 [$([#7;X3])] [#17;X1] !@-
+#
+###############################################################################
+#
+###############################################################################
+#
+#
+# Si-|-O 
+#
+CTR rotOcn2$Sisp3$XX 170000 [$([#8;X2])] [#14;X4] !@-
+#
+###############################################################################
+#
+###############################################################################
+#
+#
+# P-|-O 
+#
+CTR rotPcn3OrCoord$Ocn2$XX 180000 [$([#15;X3]),$([#15;X4](~[Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])(~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])~[#1,B,#6,#7,#8,F,Si,P,S,Cl,As,Se,Br,I])] [#8;X2] !@-
+#
+# P-|-N
+#
+CTR rotPcn3$Ncn3$XX 181000 [$([#15;X3])] [#7;X3] !@-
+#
+###############################################################################
+#
+###############################################################################
+#
+#
+# Sn-|-N
+#
+CTR rotNcn3$Sncn4$XX 190000 [$([#7;X3])] [#50;X4] !@-
+#
+###############################################################################
+#
+###############################################################################
+#
+#
+# Met-|-C
+#
+CTR rotMetal$Ccn3DB$XX 200000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X3])] !@=
+CTR rotMetal$Ccn3SB$XX 200001 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X3])] !@-
+#
+# Met-|-CN
+#
+CTR rotMetal$CN$XX 201000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X2]~[#7])] !@-
+#
+# Met-|-CO
+#
+CTR rotMetal$CO$XX 202000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X2]~[#8])] !@-
+#
+# Met-|-CS
+#
+CTR rotMetal$CS$XX 203000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X2]~[#16])] !@-
+#
+# Met-|-CSe
+#
+CTR rotMetal$CSe$XX 204000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#6;X2]~[#34])] !@-
+#
+# Met-|-N
+#
+CTR rotMetal$Ncn2$XX 210000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X2])] !@-
+#
+CTR rotMetal$Ncn3$XX 211000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X3])] !@-
+#
+CTR rotMetal$Ncn4$XX 212000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#7;X4])] !@-
+#
+# Met-|-P
+#
+CTR rotMetal$Pcn4$XX 220000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#15;X4])] !@-
+#
+# Met-|-As
+#
+CTR rotMetal$Ascn4$XX 230000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#33;X4])] !@-
+#
+# Met-|-O
+#
+CTR rotMetal$Ocn3$XX 240000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#8;X3])] !@-
+#
+# Met-|-S
+#
+CTR rotMetal$S$XX 250000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#16;X3])] !@-
+#
+CTR rotMetal$SO$XX 251000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#16;X4]=O)] !@-
+#
+CTR rotMetal$Scn2$XX 252000 [Sc,Ti,V,Cr,Mn,Fe,Co,Ni,Cu,Zn,Y,Zr,Nb,Mo,Tc,Ru,Rh,Pd,Ag,Cd,La,Hf,Ta,W,Re,Os,Ir,Pt,Au,Hg,Ac,Ce,Pr,Nd,Pm,Sm,Eu,Gd,Tb,Dy,Ho,Er,Tm,Yb,Lu,Th,Pa,U,Np,Pu,Am,Cm,Bk,Cf,Es,Fm,Md,No,Lr] [$([#16;X2]=[#6])] !@-
+#
+#

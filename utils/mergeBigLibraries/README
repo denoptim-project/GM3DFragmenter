@@ -1,0 +1,9 @@
+
+To use doSplitAndMerge_allInOnce.sh:
+
+./doSplitAndMerge_allInOnce.sh <libOfFragsToMerge1> <libOfFragsToMerge2> ... <libOfFragsToMergeN>
+
+NB: the use of SplitAndMerge causes the generation of more than
+    hundreds of files even for small libraries. 
+    It is suggested to run these tools in a dedicated folder after proper modification of the script
+

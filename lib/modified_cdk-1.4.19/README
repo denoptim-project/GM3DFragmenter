@@ -1,0 +1,11 @@
+This folder contains all the modification of the cdk-1.4.19 library taked from:
+
+Remote URL: https://github.com/cdk/cdk.git
+Branch: cdk-1.4.x
+Commit 29dc71957334b8410cc38bcd9fb67c8ab976ecd5
+
+The folder includes also the associated licence under doc/lgpl.license.
+
+Modification to the code can be found by searching blocks of lines labelled by the "//MFmod" and "//MFend" comments.
+
+These files are discributed under the LGPL v2

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GM3DFragmenter - User manual</title>
+  <meta charset="UTF-8">
+  <style>
+   h1 {text-align: center;}
+   h2 {text-align: center;}
+   table,th,td {border:1px solid;}
+  </style>
+</head>
+<body>
+
+<h1>GM3DFragmenter - User Manual</h1>
+<h2>by Marco Foscato</h2>
+<h2>University of Bergen (Norway)</h2>
+
+<hr>
+<h3>Table of Contents</h3>
+<a href="#Introduction">Introduction</a><br>
+<a href="#Building">Building GM3DFragmenter</a><br>
+<a href="#Running">Running GM3DFragmenter</a><br>
+<a href="#Parameters">Parameters file</a><br>
+<a href="#Tasks">Tasks for GM3DFragmenter</a><br>
+<a href="#Cutting">Cutting rules</a><br>
+<a href="#Parallelization">Parallelization</a><br>
+<a href="#Keywords">Keywords</a><br>
+<a href="#References">References</a><br>
+<hr>
+
+<br>
+<a id="Introduction"><h3>Introduction</h3></a>
+<p>
+GM3DFragmenter is a tool for the fragmentation of molecules and the managment of
+ libraries of the molecular fragments resulting from the fragmentation. 
+The main scope of the fragmentation being the preparation of building blocks for 
+automated construction of molecules according to the so-called class-based aprroach.
+That is, the cutting rules used to define which bonds to break to generate fragments 
+are used also to classify the main property of the attachment points replacing the 
+broken bond.<sup><a href="#1">1</a></sup>
+GM3DFragmenter can perform fragmentation of both 2D and 3D molecular structures, 
+thus allowing to generate the 3D fragments needed for the direct construction of 
+3D structures from 3D fragments.<sup><a href="#2">2</a></sup><br>
+</p>
+
+
+<br>
+<a id="Building"><h3>Building GM3DFragmenter</h3></a>
+<p>
+Just run the building script named <code>build_GM3DFragmenter.sh</code>.<br>
+Some other utilities are available in the <code>utils</code> folder and are NOT built 
+by the above-mentioned script. To build also such utilities, run the scripts <code>utils/ExtractMostCommonConformer/build.sh</code> and <code>utils/parallelize/build_Parallelize_SplitAndMerge.sh</code>.
+</p>
+
+
+<br>
+<a id="Running"><h3>Running GM3DFragmenter</h3></a>
+<p>
+To use GM3DFragmenter for any of the <a href="#Tasks">tasks listed below</a>, it is necessary to prepare a file with all the parameters defining what and how (see <a href="#Parameters">Parameters file</a>). Then, just submit the parameter file (i.e., <code>input.par</code> to GM3DFragmenter:
+<br>  
+<code>java -jar GM3DFragmenter.jar input.par </code>.                               
+<br>
+The <code>test</code> folder contains some examples of parameters file.
+</p>
+
+
+<br>
+<a id="Parameters"><h3>Parameters file</h3></a>
+<p>All the instructions to GM3DFragmenter are provided via a single parameter file.
+This file is a simple text file in which you, user, have to write all the keywords
+needed to make GM3DFragmenter do what you want. Each line must contain only a single
+keyword or a single keyword-arguments instruction. The keyword must be written with
+CAPITAL LETTERS without leading spaces. For keywords requiring one or more arguments,
+spaces are used to separate both the keyword and the first argument and between arguments.
+Lines starting with '#' are ignored.
+Examples of Parameter files can be found in the <code>test</code> folder.
+</p>
+
+
+<br>
+<a id="Tasks"><h3>Tasks for GM3DFragmenter</h3></a>
+<p>
+GM3DFragmenter is capable of a list of tasks and requires
+ instructions from the user in the form of a list keywords 
+(see <a href="#Parameters">Parameters file</a>) that define which tasks 
+are to be performed and with which settings.
+The following tasks can be performed with GM3DFragmenter both as single step, that 
+is you can require the execution of one of these steps alone, and, for many of these tasks,
+ in sequence. In the latter case, the tasks are executed according to the order in the 
+following list using each tack the output from the preceding task. 
+Note that the fragmentation of molecular object is the default task and will always be
+ executed unless the keyword <a href="#NOFRAGMENTATION">NOFRAGMENTATION</a> is specified.
+</p>
+<ol type="A">
+<li><h4>Check molecular structures.</h4>
+GM3DFragment can check the consistency between the declared molecular formula of 
+an input molecule and its actual structure. This is needed,
+for example, when working with molecules from Cambridge Structural Database that can
+have missing atoms (mainly H, but not only). See keywords 
+<a href="#CHECKFORMULA">CHECKFORMULA</a> and <a href="#FORMULATXTFILE">FORMULATXTFILE</a> below.
+In addition, since certain notations can lead to ambiguities, GM3DFragmenter has routines that 
+try to fix the notation in the input structures. This optional task is activated with the keyword
+<a href="#ANALYSEANDFIX">ANALYSEANDFIX</a>.
+For example, aromatic but metal coordinating molecules are not properly treated by standard CDK 
+(at least, for the time being), thus GM3DFragmenter can be used to define explicit 
+alternation of single and double bonds instead of aromatic type of bonds. Again, this is 
+needed if you want to use molecules taken from Cambridge Structural Database. 
+Note that the de-kekulization (move bond types from aromatic to single/double)
+allow to avoid ambiguities in the application of cutting rules on metal coordinating aromatics,
+ but, on the other hand, may reject some molecules and thus require manual de-kekulization.
+</li>
+<li><h4>Filter molecular structures.</h4> 
+Pre-fragmentation selection on the input molecules can be performed based on SMARTS using the keyword <a href="#PREFILTERSMARTS">PREFILTERSMARTS</a>. Molecules matching any of the given smarts will be ignored.
+</li>
+<li><h4>Fragment molecular structures.</h4>
+Perform the fragmentation of 2D or 3D molecular objects with generation of a library 
+of fragments. This is the default task for GM3DFragmenter unless
+ the keyword <a href="#NOFRAGMENTATION">NOFRAGMENTATION</a> is used. 
+To perform the fragmentation, GM3DFragmenter requires a formatted list of
+<a href="#Cutting">cutting rules</a>. 
+Other settings can be specified with the keywords below.
+</li>
+<li><h4>Filter molecular fragments.</h4>
+A library of fragments can be filtered according to a given the selection criteria. 
+This task is commonly performed during fragmentation but can also be required as 
+an independent task by the use of the keyword <a href="#ONLYFILTER">ONLYFILTER</a>.
+ The selection criteria applied are the same that are applied during fragmentation.
+ See keywords below.
+</li>
+<li><h4>Split libraries of fragments (on molecular weight).</h4>
+To handle more efficiently large libraries of fragments it is convenient to divide
+ them into sub-libraries characterized by a range of molecular weight. The keyword 
+<a href="#MWSPLITTING">MWSPLITTING</a> allows to require splitting of the library of 
+fragments and specify the wideness of the MW bins.
+</li>
+<li><h4>Merge libraries of fragments.</h4>
+Two or more libraries of fragments can be unified into a single library using the keyword 
+<a href="#MERGELIBRARY">MERGELIBRARY</a>.
+</li>
+<li><h4>Sort library of fragments (on molecular weight).</h4>
+Molecular weight-based sorting of libraries of fragments can be obtained using the keyword
+<a href="#MWREORDER">MWREORDER</a>. Ascending order is the default direction, unless 
+<a href="#MWREORDER">MWREORDER</a> is accompanied by
+<a href="#REVERSEMWORDER">REVERSEMWORDER</a>.
+</li>
+<li><h4>Group rotamers of fragments.</h4>
+This tasks consist in identifying the rotamers of each 3D fragment in a library and store
+them into sub-libraries. Each fragments and its rotamers are assigned with an identification
+label stored in the 'ISOMER' field of SDF output files. See <a href="#GROUPROTAMERS">GROUPROTAMERS</a> keyword.
+</li>
+<li><h4>Extract fragments based on APclass.</h4>
+Fragments can be extracted from libraries looking at the attachment point class (APclass) using the keyword <a href="#EXTRACTCLASS">EXTRACTCLASS</a>
+</li>
+<li><h4>Extract fragments based on SMARTS.</h4>
+Fragments can be extracted from libraries using SMARTS queries using the keyword <a href="#EXTRACTSMARTS">EXTRACTSMARTS</a>
+</li>
+<li><h4>Create Compatibility Matrix from cutting rules.</h4>
+Using the keyword <a href="#MAKECPMFROMRULES">MAKECPMFROMRULES</a> you can write the simplest compatibility matrix related with the list of cutting rules provided. 
+</li>
+</ol>
+Not all of these tasks can be executed in sequence. Apart from the logical sequence of task 
+(A,B,C,D,G) which is of naturally permitted, the user can chose to perform only some of 
+these steps combining them also with G and/or H. The user will have to provide all the 
+required keywords in one parameter file
+(see the <code>test</code> folder). The same applies to input files, with the exception of
+structure-type of input that is passes internally from a task to the next one in the sequence. 
+On the contrary, tasks like E,F,I,J, and K generate multiple output and, apart from combinations
+ with G and H, are not tested in sequence-type of jobs and may require some development.
+
+
+<br>
+<a id="Cutting"><h3>Cutting rules</h3></a>
+<p>The cutting rules define which bonds should be broken to generate molecular fragments. 
+A single formatted text file is used to provide the cutting rules to GM3DFragmenter. 
+The following keywords are recognized:
+</p>
+<ul>
+<li><b>ANY</b>: used to specify rule components matching any atom;</li>
+<li><b>CTR</b>: used to identify a single cutting rule.</li>
+</ul>
+Lines starting with the <b>CTR</b> keyword must adhere to the following format:<br>
+<code>CTR [rulename] [inv_priority] [1st_atm_SMARTS] [2nd_atm_SMARTS] [bnd_SMARTS] [options]</code>
+Where
+<ul>
+<li><code>[rulename]</code> is a single word defining the mane of the cutting rule. The class
+ of attachment points generated by the action of the cutting rule derives from this rule name.</li>
+<li><code>[inv_priority]</code> is an integer (with sign) that is used to specify the priority 
+order for the application of cutting rules. GM3DFragmenter will apply the rules starting
+ from the lowest <code>[inv_priority]</code> in ascending order.</li>
+<li><code>[1st_atm_SMARTS]</code> is an atom SMARTS query matching one of the atoms involved in the bond.</li>
+<li><code>[2nd_atm_SMARTS]</code> is an atom SMARTS query matching one of the atoms involved in the bond.</li>
+<li><code>[bnd_SMARTS]</code> is a bond SMARTS query matching the bond between the atoms identified above.</li>
+<li><code>[options]</code> is an optional list of properties that apply to the cutting rule. 
+For a candidate bond to be considered a true match, all optional conditions must be satisfied simultaneously (i.e., logical AND).
+  <ul>
+  <li><code>HAPTO</code> specifies that the bond matched by the cutting rule has to be part of 
+  multihapto system.<sup><a href="#1">1</a></sup> Not compatible with RING and OMRING options.</li>
+  <li><code>RING>n</code> (where n is an integer) specifies that the target bond, if part of an organic ring (i.e., not containing any metal atoms), is considered a true match only if the number of ring members is above <code>n</code>.</li>
+  <li><code>OMRING>n</code> (where n is an integer) works like RING>n but is restricted to rings involving one or more metals.</li>
+  </ul>
+</li>
+</ul>
+The <code>data</code> folder contains examples of cutting rules used in various contexts. 
+
+
+
+
+
+<br>
+<a id="Parallelization"><h3>Parallelization</h3></a>
+Despite the fact that GM3DFragmenter performs simple operations
+usually on small molecules (150-200 atoms), the task becomes very demanding with the 
+increase of the number of molecules, cutting rules and fragments to handle. On the other
+hand, the nature of the tasks is that of an embarrassingly parallel problem. In fact,
+the fragmentation of each molecule is totally independent from the fate other molecules.
+While a robust parallelized version of GM3DFragmenter is still to be written, you can exploit
+the availability of several processors by applying a bunch of tools and scripts (located in 
+<code>utils/parallelize</code> folder) that will perform these steps:
+<ol type="I">
+<li>Split the fragmentation into smaller fragmentation tasks (fewer molecules).</li>
+<li>Run small fragmentations in parallel.</li>
+<li>Split each library of fragments according to molecular weight (MW).</li>
+<li>Merge all the fragment libraries referring to the same MW and get unique fragments.</li>
+<li>Merge the libraries of unique fragments.</li>
+</ol>
+The procedure is semi-automatic, meaning that the user has to manually start the scripts 
+entitled to perform each of the steps. This is because the single tasks in each of the steps 
+(splitting, fragmentation, splitting, merging and final merging) can
+be completed at different moments. Therefore, the user must verify that all tasks 
+are completed before embarking into the next step. <br>
+<b>WARNING!</b> For the moment the scripts and tools are meant to work on a cluster with PBS 
+queue system (i.e., fimm.bccs.uib.no with the <code>-queueFIMM</code> option). In alternative, for test, you can play with a Linux 
+workstation (using <code>-queue187</code> option; see help message from <code>java -jar ParallelizeGM3DF.jar</code>)
+<br>
+To be more pragmatic, here is the detailed procedure that allows to parallelize the 
+fragmentation of a large library of molecules with GM3dFragmenter (note that
+ the tools have to be built
+ before deployment; see also <a href="#Building">Building GM3DFragmenter</a>). 
+Note that log files (named <code>log*</code>) are generated for the most time consuming steps.
+Before moving to the next step you should check that all tasks of a given step have been completed,
+for example, you can search for the "<code>Task completed</code>" message in the log files 
+of a given step before continuing to the next step.
+
+<ol type="I">
+<li>Run ParallelizeGM3DF.jar to prepare the scripts and input for small fragmentation tasks.
+<br>Have a look at the help message with <code>java -jar ParallelizeGM3DF.jar</code>. 
+   <br>
+   <br><code>java -jar ParallelizeGM3DF.jar [options]</code>
+   <br>
+   <br>
+</li>
+<li>Run small fragmentation. Submit the fragmentation jobs to the queue.
+   <br>
+   <br><code>./RunAllGM3DFragmentation_*</code><br>
+   <br>
+</li>
+<li>When all fragmentations are completed, run SplitAndMerge.jar to split the libraries of fragments according to MW.
+<br>Have a look at the help message with <code>java -jar SplitAndMerge.jar</code>
+   <br>
+   <br><code>java -jar SplitAndMerge.jar split [options]</code><br>
+   <br><code>./RunAllSPLITTING_*</code><br>
+   <br>
+</li>
+<li>When all splitting tasks are completed, run SplitAndMerge.jar to merge all the fragments belonging to the same MW range.
+   <br>
+   <br><code>java -jar SplitAndMerge.jar merge [options]</code><br>
+   <br><code>./RunAllMERGING_*_*</code><br>
+   <br>
+</li>
+<li>(Optional) You may want to update the isomer's identification numbers (i.e., SDF field <code>ISOMER</code>). These numerical labels (format X_XXXXXXXXXXXXX-XXX) can be used to identify alternative conformations of a fragment. 
+When fragments are clustered in a parallel fashion, the ISOMER codes remain consistent <b>ONLY WITHIN A SINGLE THREAD</b>. 
+Nevertheless, with the execution of <code>SplitAndMerge</code> a BASH script named <code>RunAllFrgKeyConversion.sh</code> is produced and can be used to change the ISOMER codes in a consistent manner.<br> 
+Note that this step is required only when <code>ExtractMostCommonConformer</code> is to be used to extract the representative conformation from a library that has been generated using the <a href="#KEEPDUPLICATES">KEEPDUPLICATES</a> option.
+   <br>
+   <br><code>RunAllFrgKeyConversion.sh</code><br>
+   <br>
+</li>
+<li>Collect the results into one library of unique fragments and one library with all the fragments.
+   <br>
+   <br><code>makeSingleLib.sh</code><br>
+   <br>
+</li>
+<li>(Optional) To extract the most representative conformation of a fragment, provided that you have kept the duplicates during the fragmentation step (<a href="#KEEPDUPLICATES">KEEPDUPLICATES</a> keyword), you can use <code>ExtractMostCommonConformer</code>: 
+   <br>
+   <br><code>java -jar ExtractMostCommonConformer [options] lib_allFrags.sdf</code><br>
+   <br>
+This will find the most representing fragmnet by comparing all fragments that are labelled with the same ISOMER code, and aligning the 3D geometries independently on the atom lists. The size of this problem scales quickly with the number of atoms in the fragments, and the number of fragments to compare. In practice, to extract the most representative fragment for fragments with more than 10 atoms/attachment_points, the number of candidate framgents should be lower than 50.
+</li>
+</ol>
+
+<a id="Keywords"><h3>Keywords</h3></a>
+<table>
+  <tr>
+    <th>Keyword</th>
+    <th>Arguments</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><a id="ADDIDTOAPCLASS">ADDIDTOAPCLASS</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter add a unique ID on each pair of attachment points generated by breaking of a bond. The unique ID is added to the APClass of each attachment point. This option allow to keep track of exactly which fragments and which fragment-fragment connections have to be used to rebuild a molecule from its fragments. This option cannot be used in combination with tools for <a href="#Parallelization">Parallelization</a>. Moreover, all atoms on the initial molecule will be found in the fragments as the unique indexing of the attachment points makes all fragments be unique (i.e., no duplicate can be found).</td>
+  </tr>
+  <tr>
+    <td><a id="ADDDUMMYONLINEAR">ADDDUMMYONLINEAR</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter add dummy atoms in correspondence of linearities. 
+Use this keyword whenever you need to handle fragments or molecules with internal
+ coordinates. For instance, dummy atoms on linearities are required to build 
+molecules with the full-3D method of DENOPTIM.</td>
+  </tr>
+  <tr>
+    <td><a id="ANALYSEANDFIX">ANALYSEANDFIX</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter to evaluate the input structures and try to fix
+ notations that may lead to ambiguities (i.e., bond aromaticity).</td>
+  </tr>
+  <tr>
+    <td><a id="CHECKFORMULA">CHECKFORMULA</a></td>
+    <td>-</td>
+    <td>Requires comparison of the molecular formula which the actual elemental
+ analysis of the structure provided as input. Use this keyword, in combination 
+with <a href="#FORMULATXTFILE">FORMULATXTFILE</a>, when the structures provided
+ in SDF are taken from Cambridge Structural Database to identify missing atoms 
+not reported in the CSD reports.</td>
+  </tr>
+  <tr>
+    <td><a id="CONVERTLIBRARY">CONVERTLIBRARY</a></td>
+    <td>[String: <code>oldFormat</code>] [String: <code>newFormat</code>]</td>
+    <td>Converts the format of the library of fragments from the <code>oldFormat</code> 
+to <code>newFormat</code>. See acceptable formats <a href="#Formats">here</a>. 
+This task is still under development.</td>
+  </tr>
+  <tr>
+    <td><a id="EXTRACTCLASS">EXTRACTCLASS</a></td>
+    <td>[String: <code>list_APclasses.txt</code>]</td>
+    <td>Makes GM3DFragmenter look into the loaded library of fragments (from previous 
+task or from input) and extract for all fragments porting at least one attachment
+ point with one of the APclass listed in the text file <code>list_APclasses.txt</code> (one per line). 
+Fragments
+matching this criterion are stored in output file <code>targets.sdf</code>
+while other fragments are stored in <code>others.sdf</code>.</td>
+  </tr>
+  <tr>
+    <td><a id="EXTRACTSMARTS">EXTRACTSMARTS</a></td>
+    <td>[String: <code>list_SMARTS.txt</code>]</td>
+    <td>Makes GM3DFragmenter look into the loaded library of fragments (from previous 
+task or from input) and extract for all fragments matching one of the SMARTS queries reported in
+the text file <code>list_SMARTS.txt</code> (one per line). Fragments
+matching this criterion are stored in output file <code>targets.sdf</code>
+while other fragments are stored in <code>others.sdf</code>.</td>
+  </tr>
+  <tr>
+    <td><a id="FORMULATXTFILE">FORMULATXTFILE</a></td>
+    <td>[String: <code>formula.txt</code>]</td>
+    <td>This keyword is used to specify the file (with path, if not in the working 
+directory) containing the molecular formula of the input molecules. The expected 
+format for this text file is the format used by ConQuest-1.14<sup><a href="#3">3</a></sup>
+ for reporting chemical information on CSD entries. In particular, the field 
+<code>REFCODE</code> is used to link the structures in the SDF file and the records 
+formulae file. Next, the formula is read from the line beginning with <code>  Formula</code>
+(Note the two leading spaces). </td>
+  </tr>
+  <tr>
+    <td><a id="GROUPROTAMERS">GROUPROTAMERS</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter execute the task of exploring the currently loaded library
+ of fragments (loaded from input in case of NOFRAGMENTATION tasks) looking for duplicate fragments, i.e.,
+ rotamers, and requires assignation of a unique identified to every group of rotamers.
+ Such identified is stored in the field 'ISOMER' of the output SDF file. Note that due
+ to this task can require significant computational efforts due to inefficient routines
+ that are still to be made more efficient... Therefore, in case of large libraries of 
+fragments, it is suggested to limit this task to a properly selected sub-library (for
+ instance, fragments within a small range of molecular weight). </td>
+  </tr>
+  <tr>
+    <td><a id="">IGNOREKNOWNFRAGS</a></td>
+    <td>[String: <code>knownFrags.sdf</code>] [String: <code>format</code>]</td>
+    <td>Makes GM3DFragmenter ignore the fragments that are listed in the input SDF file. 
+See acceptable formats <a href="#Formats">here</a>.</td>
+  </tr>
+  <tr>
+    <td><a id="KEEPDUPLICATES">KEEPDUPLICATES</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter store all duplicate fragments.</td>
+  </tr>
+  <tr>
+    <td><a id="KEEPISOTOPES">KEEPISOTOPES</a></td>
+    <td>-</td>
+    <td>By default GM3DFragmenter rejects fragments with isotopes other than the most diffuse isotope per each element. Use this keyword to retain fragments porting isotopes different from the implicitly intended.</td>
+  </tr>
+  <tr>
+    <td><a id="LINEARBONDTHLD">LINEARBONDTHLD</a></td>
+    <td>[Double: <code>threshold</code>]</td>
+    <td>Defines the threshold adopted for identifying close-to-linear bond angles. If three
+bounded atoms describe an angle higher than <code>threshold</code>, the system is considered a linearity.
+In combination with <a href="#ADDDUMMYONLINEAR">ADDDUMMYONLINEAR</a>, is used to add dummy atoms on linear systems in case fragments are used in contexts adopting internal coordinates.
+  </td>
+  </tr>
+  <tr>
+    <td><a id="LOOKFORTARGETFRAGS">LOOKFORTARGETFRAGS</a></td>
+    <td>[String: <code>targets.sdf</code>] [String: <code>format</code>]</td>
+    <td>Makes GM3DFragmenter perform a special fragmentation in which only a specific list
+ of fragments is collected. Such targets of the fragmentation process are defined in the 
+SDF file <code>targets.sdf</code> using fragment-format defined by the string <code>format</code>. 
+See acceptable formats <a href="#Formats">here</a>. </td>
+  </tr>
+  <tr>
+    <td><a id="MAKECPMFROMRULES">MAKECPMFROMRULES</a></td>
+    <td>-</td>
+    <td>Allows the generation of a compatibility matrix from the list of cutting rules 
+(see <a href="#RULESFILE">RULESFILE</a>).</td>
+  </tr>
+  <tr>
+    <td><a id="MAXFRAGSIZE">MAXFRAGSIZE</a></td>
+    <td>[Integer: <code>maxAtoms</code>]</td>
+    <td>Defines the maximum number of heavy (non-H) atoms per each fragment. Fragments with more than <code>maxAtoms</code> heavy (non-H) atoms will be rejected.</td>
+  </tr>
+  <tr>
+    <td><a id="MERGELIBRARY">MERGELIBRARY</a></td>
+    <td>[String: <code>lib_1.sdf</code>] [String: <code>lib_1_unique.sdf</code>]</td>
+    <td>Requires GM3DFragmenter to merge the current library (from previous step or input) to <code>lib_1.sdf</code>. In case where a unique list of fragments for <code>lib_1.sdf</code> is provided as <code>lib_1_unique.sdf</code>, the latest is used to identify new unique fragments from the current library and assign the rotamer membership label 'ISOMER'.</td>
+  </tr>
+  <tr>
+    <td><a id="MINFRAGSIZE">MINFRAGSIZE</a></td>
+    <td>[Integer: <code>minAtoms</code>]</td>
+    <td>Defines the minimum size of acceptable fragments in terms of number of atoms (including H). Fragments with less that <code>minAtoms</code> atoms (including H) will be rejected.</td>
+  </tr>
+  <tr>
+    <td><a id="MWMERGE">MWMERGE</a></td>
+    <td>[String: <code>lib_1.sdf</code>] [String: <code>lib_2.sdf</code>] [String: <code>...</code>] </td>
+    <td>Requires merging of sub-libraries corresponding to the same molecular weight range. 
+This keyword is meant for <a href="#Parallelization">Parallelization</a> of the fragmentation task.</td>
+  </tr>
+  <tr>
+    <td><a id="MWREORDER">MWREORDER</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter reordering the fragment library according to molecular weight (ascending).</td>
+  </tr>
+  <tr>
+    <td><a id="MWSPLITTING">MWSPLITTING</a></td>
+    <td>[Integer: <code>mwrange</code></td>
+    <td>Makes GM3DFragmenter splitting the current library of fragments into slots of molecular weight with range of units defined by the argument <code>mwrange</code>.</td>
+  </tr>
+  <tr>
+    <td><a id="NOFRAGMENTATION">NOFRAGMENTATION</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter skip the fragmentation task.</td>
+  </tr>
+  <tr>
+    <td><a id="ONLYFILTER">ONLYFILTER</a></td>
+    <td>-</td>
+    <td>Makes GM3DFragmenter perform only filtration of the fragment library provided as input via <a href="#STRUCTURESFILE">STRUCTURESFILE</a>. No fragmentation will be performed.</td>
+  </tr>
+  <tr>
+    <td><a id="PREFILTERSMARTS">PREFILTERSMARTS</a></td>
+    <td>[String: <code>SMARTS</code>]</td>
+    <td>Activates pre-filtering of molecules according to SMARTS. Molecules matching the SMARTS queries provided as argument are rejected. The user can specify more than one such keywords in the same parameters file.</td>
+  </tr>
+  <tr>
+    <td><a id="REJECTCLASS">REJECTCLASS</a></td>
+    <td>[String: <code>rejClass.txt</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the APclass of the fragments and reject those matching one of the classes listed in the text file <code>rejClass.txt</code> (one class per line). The user can specify more than one such keywords in the same parameters file.</td>
+  </tr>
+  <tr>
+    <td><a id="REJECTCLASSCOMBINATION">REJECTCLASSCOMBINATION</a></td>
+    <td>[String: <code>APClass_A</code>] [String: <code>APClass_B</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the combinations of APClasses on the same fragment. Fragments porting an attachment point of class <code>APClass_A</code> and also an attachment point of class <code>APClass_B</code> will be rejected. The user can specify more than one such keywords in the same parameters file.</td>  
+  </tr>
+  <tr>
+    <td><a id="REJECTNOTSMARTS">REJECTNOTSMARTS</a></td>
+    <td>[String: <code>SMARTS</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the fragments and reject those that do NOT match the 
+query given as argument. The user can specify more than one such keywords in the same parameters file.</td>
+  </tr>
+  <tr>
+    <td><a id="REJECTSMARTS">REJECTSMARTS</a></td>
+    <td>[String: <code>SMARTS</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the fragments and reject those that do match the 
+query given as argument. The user can specify more than one such keywords in the same parameters file.</td>
+  </tr>
+  <tr>
+    <td><a id="REJELEMENT">REJELEMENT</a></td>
+    <td>[String: <code>element_symbol</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the elemental formula of a fragment and reject those that
+contains the element specified as argument. The user can specify more than one such keywords in the same parameters file.</td>
+  </tr>
+  <tr>
+    <td><a id="REJFORMULALESSTHAN">REJFORMULALESSTHAN</a></td>
+    <td>[String: <code>elSymb_minNum</code>] [String: <code>elSymb_minNum</code>] [String: <code>elSymb_minNum</code>] [String: <code>...</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the elemental formula of each fragment and reject those 
+that contains less atoms per each of the elements specified as argument. For example, the argument 
+may be 'N6', thus all molecules with less than 6 nitrogen atoms will be rejected. Or the 
+argument may be 'N6 C5', thus causing rejection of all molecules with less than 6 nitrogen atoms
+ AND less than 5 carbon atoms. The user can specify more than one such keywords in the same 
+parameters file.</td>
+  </tr>
+  <tr>
+    <td><a id="REJFORMULAMORETHAN">REJFORMULAMORETHAN</a></td>
+    <td>[String: <code>elSymb_maxNum</code>] [String: <code>elSymb_maxNum</code>] [String: <code>elSymb_maxNum</code>] [String: <code>...</code>]</td>
+    <td>Makes GM3DFragmenter evaluate the elemental formula of each fragment and reject those that
+contains more atoms per each of the elements specified as argument. For example, the argument 
+may be 'N6', thus all molecules with more than 6 nitrogen atoms will be rejected. Or the 
+argument may be 'N6 C5', thus causing rejection of all molecules with more than 6 nitrogen atoms 
+ AND more than 5 carbon atoms. The user can specify more than one such keywords in the same 
+parameters file</td>
+  </tr>
+  <tr>
+    <td><a id="REMOVEINTERFILES">REMOVEINTERFILES</a></td>
+    <td>-</td>
+    <td>When a sequence of tasks is required, makes GM3DFragmenter deleting the output of intermediary steps.</td>
+  </tr>
+  <tr>
+    <td><a id="REPORT">REPORT</a></td>
+    <td>[Integer: <code>verbosity</code>]</td>
+    <td>Defined the level of verbosity for logging.</td>
+  </tr>
+  <tr>
+    <td><a id="REVERSEMWORDER">REVERSEMWORDER</a></td>
+    <td>-</td>
+    <td>In combination with <a href="#MWREORDER">MWREORDER</a> makes GM3DFragmenter reorder the library of fragments according to molecular weight (descending).</td>
+  </tr>
+  <tr>
+    <td><a id="RULESFILE">RULESFILE</a></td>
+    <td>[String: <code>cuting.rul</code>] </td>
+    <td>Specifies the text file containing the cutting rules.</td>
+  </tr>
+  <tr>
+    <td><a id="STRUCTURESFILE">STRUCTURESFILE</a></td>
+    <td>[String: <code>structured.sdf</code>] </td>
+    <td>Specifies the SDF file containing the input structures that can be both molecules or fragments depending on the task.</td>
+  </tr>
+</table>
+
+<br>
+<a id="Formats"><h3>Formats</h3></a>
+Acceptable formats for fragments are:
+<ul>
+<li>
+<i>DENOPTIM</i> = SDF file with DENOPTIM-style notation of attachment points. 
+</li>
+</ul>
+
+<br>
+<a id="References"><h3>References</h3></a>
+<p>
+<a id="1">1</a>. Foscato, M.; Occhipinti, G.; Venkatraman, V.; Alsberg, B. K.;
+Jensen, V. R. Automated Design of Realistic Organometallic
+Molecules from Fragments. <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 767-780.<br>
+<a id="2">2</a>. Foscato, M.; Venkatraman, V.; Occhipinti, G.; Alsberg, B. K.;
+Jensen, V. R. Automated Building of Organometallic Complexes from
+3D Fragments. <i>J. Chem. Inf. Model.</i> <b>2014</b>, 54, 1919-1931.<br>
+<a id="3">3</a>. Bruno, I. J.; Cole, J. C.; Edgington, P. R.; Kessler, M.; 
+Macrae, C. F.; McCabe, P.; Pearson, J.; Taylor, R. New Software for Searching 
+the Cambridge Structural Database and Visualizing Crystal Structures. <i>Acta 
+Crystallogr.</i> B <b>2002</b>, 58, 389-397.
+</p>
+</body>
+</html>
