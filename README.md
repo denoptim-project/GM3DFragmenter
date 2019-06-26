@@ -28,11 +28,6 @@ To build GM3DFragmenter run:
 
         ./build_GM3DFragmenter.sh
 
-Then you can run tests that with
-
-        cd tests
-        ./runAllTests.sh
-
 Now, you are ready to go. Happy fragmenting!
 
 ## User Manual
