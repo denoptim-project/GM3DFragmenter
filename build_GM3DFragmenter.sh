@@ -2,7 +2,7 @@
 
 #settings
 locdir=`pwd`
-javapath="/usr/bin"
+javapath="$JAVA_PATH/bin"
 src="$locdir/src"
 jar="$locdir/jar"
 lib="$locdir/lib"
